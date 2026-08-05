@@ -1,0 +1,29 @@
+[package]
+name = "materialize"
+description = "A model phasing into existence: a wireframe forms, glass shards fly in and assemble over it, then the real surface reveals itself behind a glowing seam"
+version = "0.1.0"
+authors = ["Matthew Berger <matthewjordanberger@gmail.com>"]
+license = "MIT OR Apache-2.0"
+edition = "2024"
+
+[[bin]]
+name = "materialize"
+path = "src/main.rs"
+
+[dependencies]
+nightshade = { git = "https://github.com/matthewjberger/nightshade", rev = "89eefc9d763856c2aa4f5474afac03d22c85039d", features = [
+    "tracing",
+] }
+nalgebra-glm = { version = "0.20.0", features = ["convert-bytemuck"] }
+bytemuck = "1.25.0"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+
+[profile.wasm-release]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
