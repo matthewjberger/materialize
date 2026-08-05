@@ -41,58 +41,58 @@ pub fn build(materialize: &mut Materialize, world: &mut World) {
             handles.reset = tree.add_button("Reset to defaults");
 
             tree.add_label("");
-            tree.add_label("Playback");
+            described(tree, "Playback", "The whole effect is one progress value running out and back, so the model builds itself and then takes itself apart through the same stages in reverse.");
             handles.play = tree.add_button("Pause");
             handles.restart = tree.add_button("Restart");
             handles.progress_label = tree.add_label("Progress 0.00");
             handles.scrub = tree.add_slider(0.0, 1.0, 0.0);
 
             tree.add_label("");
-            tree.add_label("Wireframe");
-            tree.add_label("Thickness");
+            described(tree, "Wireframe", "Stage one. The model's unique edges, drawn as ribbons that turn to face the camera, forming ahead of everything else.");
+            described(tree, "Thickness", "Width of the edge ribbons, as a fraction of the model's height.");
             handles.wire_thickness = tree.add_slider(0.001, 0.03, wire_thickness);
-            tree.add_label("Opacity");
+            described(tree, "Opacity", "How solid the wireframe reads where it has already formed.");
             handles.wire_alpha = tree.add_slider(0.0, 1.0, wire_alpha);
-            tree.add_label("Front glow");
+            described(tree, "Front glow", "Brightness of the hot pulse riding the leading edge as the wireframe forms.");
             handles.wire_glow = tree.add_slider(0.0, 30.0, wire_glow);
 
             tree.add_label("");
-            tree.add_label("Glass");
-            tree.add_label("Translucency");
+            described(tree, "Glass", "Stage two. Every triangle of the model flies in separately from a scattered pose and lands on the surface.");
+            described(tree, "Translucency", "Base opacity of a landed shard. Shards seen edge on always read more solid than this.");
             handles.glass_alpha = tree.add_slider(0.0, 1.0, glass_alpha);
-            tree.add_label("Glow intensity");
+            described(tree, "Glow intensity", "Brightness of the flash a shard gives off as it arrives.");
             handles.glass_glow_strength = tree.add_slider(0.0, 30.0, glass_glow_strength);
-            tree.add_label("From center");
+            described(tree, "From center", "How far out shards start, pushed radially away from the middle of the model.");
             handles.center_distance = tree.add_slider(0.0, 3.0, center_distance);
-            tree.add_label("Off normal");
+            described(tree, "Off normal", "How far out shards start along the direction their own face points.");
             handles.normal_distance = tree.add_slider(0.0, 2.0, normal_distance);
-            tree.add_label("Jitter");
+            described(tree, "Jitter", "Seeded random scatter added to where each shard starts, so no two take the same path.");
             handles.jitter = tree.add_slider(0.0, 1.0, jitter);
-            tree.add_label("Fade portion");
+            described(tree, "Fade portion", "How much of a shard's flight is spent fading in from nothing. Higher arrives more gradually.");
             handles.fade_portion = tree.add_slider(0.05, 1.0, fade_portion);
-            tree.add_label("Glow cool span");
+            described(tree, "Glow cool span", "How long a shard's landing glow takes to cool off once it is seated.");
             handles.cool_span = tree.add_slider(0.05, 4.0, cool_span);
-            tree.add_label("Tumble");
+            described(tree, "Tumble", "How much a shard spins on the way in. The spin unwinds to nothing as it lands.");
             handles.tumble = tree.add_slider(0.0, 3.0, tumble);
-            tree.add_label("Assembly band");
+            described(tree, "Assembly band", "Height the assembly front spans, which sets how many shards are in flight at once.");
             handles.glass_band = tree.add_slider(0.05, 1.0, glass_band);
 
             tree.add_label("");
-            tree.add_label("Reveal");
-            tree.add_label("Seam thickness");
+            described(tree, "Reveal", "Stage three. The real textured surface, cut along a moving front with a hot seam trailing it.");
+            described(tree, "Seam thickness", "Height of the glowing band that trails the reveal front.");
             handles.seam_width = tree.add_slider(0.005, 0.3, seam_width);
-            tree.add_label("Seam brightness");
+            described(tree, "Seam brightness", "How hot that band burns. High values bloom.");
             handles.seam_strength = tree.add_slider(0.0, 40.0, seam_strength);
-            tree.add_label("Noise amount");
+            described(tree, "Noise amount", "How far noise wobbles the boundary away from a flat plane. All three stages share it, so their edges stay together.");
             handles.noise_amplitude = tree.add_slider(0.0, 0.3, noise_amplitude);
 
             tree.add_label("");
-            tree.add_label("Timing");
-            tree.add_label("Cycle seconds");
+            described(tree, "Timing", "How long the effect takes and how far the three stages trail each other.");
+            described(tree, "Cycle seconds", "Time for one direction. A full build and teardown takes twice this.");
             handles.duration = tree.add_slider(3.0, 20.0, duration);
-            tree.add_label("Glass to solid lag");
+            described(tree, "Glass to solid lag", "How far the surface reveal trails the glass assembly. At zero the surface arrives with the shards.");
             handles.lag_glass_to_solid = tree.add_slider(0.0, 1.5, lag_glass_to_solid);
-            tree.add_label("Spin speed");
+            described(tree, "Spin speed", "How fast the model turns on the spot.");
             handles.spin_speed = tree.add_slider(0.0, 1.5, spin_speed);
         });
     });
@@ -203,6 +203,25 @@ fn slider_bindings(handles: &UiHandles) -> [SliderBinding; 18] {
         }),
         (handles.spin_speed, |settings| &mut settings.spin_speed),
     ]
+}
+
+/// Adds a label that explains itself on hover. Plain labels carry no
+/// interaction component and so never hit test, which is what a tooltip needs,
+/// so this attaches one and turns pointer events back on.
+fn described(tree: &mut UiTreeBuilder, text: &str, tooltip: &str) -> Entity {
+    let entity = tree.add_label(text);
+    let world = tree.world_mut();
+    world.set(
+        entity,
+        UiNodeInteraction {
+            tooltip_text: Some(tooltip.to_string()),
+            ..Default::default()
+        },
+    );
+    if let Some(node) = world.get_mut::<UiLayoutNode>(entity) {
+        node.pointer_events = true;
+    }
+    entity
 }
 
 fn panel_content(world: &mut DynEcs, panel: Entity) -> Entity {
