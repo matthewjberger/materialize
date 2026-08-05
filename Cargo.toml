@@ -11,7 +11,7 @@ name = "materialize"
 path = "src/main.rs"
 
 [dependencies]
-nightshade = { git = "https://github.com/matthewjberger/nightshade", rev = "a8cff33d58a434c92b21dcb058a1ff86064db3fc", features = [
+nightshade = { git = "https://github.com/matthewjberger/nightshade", rev = "ca085be0654903e46733cc8f43cc53ff10007c28", features = [
     "tracing",
 ] }
 nalgebra-glm = { version = "0.20.0", features = ["convert-bytemuck"] }
