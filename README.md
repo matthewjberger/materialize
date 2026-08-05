@@ -1,5 +1,7 @@
 # Materialize
 
+<img width="480" height="270" alt="2026-08-04 19-30-44_001" src="https://github.com/user-attachments/assets/509af7da-fe7c-457f-8a0b-1d78f0bf6b23" />
+
 A model phasing into existence, built on the [Nightshade](https://github.com/matthewjberger/nightshade) engine.
 
 Three stages run over the same helmet, each its own draw:
